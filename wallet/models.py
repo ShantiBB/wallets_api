@@ -1,7 +1,10 @@
 import uuid
 
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+
+User = get_user_model()
 
 
 class Wallet(models.Model):
@@ -35,6 +38,12 @@ class Wallet(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата последнего обновления'
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='wallets',
+        verbose_name='Владелец кошелька'
     )
 
     class Meta:
