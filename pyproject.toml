@@ -10,6 +10,10 @@ python = "^3.12"
 django = "^5.1.4"
 djangorestframework = "^3.15.2"
 djoser = "^2.3.1"
+celery = "^5.4.0"
+redis = "^5.2.1"
+flower = "^2.0.1"
+django-redis = "^5.4.0"
 
 
 [build-system]
