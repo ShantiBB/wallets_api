@@ -35,7 +35,6 @@ source venv\Scripts\activate  # Для Windows
 ```
 
 ### Шаг 3: Установка зависимостей
-Установите все зависимости из requirements.txt:
 ```bash
 pip install poetry
 poetry install
