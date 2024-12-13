@@ -7,7 +7,6 @@ from rest_framework import status
 from tests.wallet.test_data import (
     wallet_data_list,
     wallet_data_retrieve,
-    wallet_data_create
 )
 from services.tasks import *
 

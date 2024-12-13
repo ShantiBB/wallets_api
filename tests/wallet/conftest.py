@@ -1,17 +1,7 @@
 import pytest
-from celery import Celery
-from django.conf import settings
 from rest_framework.test import APIClient
 
 from wallet.models import Wallet
-
-
-@pytest.fixture(scope='session')
-def celery_config():
-    return {
-        'broker_url': 'memory://',
-        'result_backend': 'rpc'
-    }
 
 
 @pytest.fixture
