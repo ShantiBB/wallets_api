@@ -21,8 +21,8 @@
 ### Шаг 1: Клонирование репозитория
 Для начала нужно клонировать репозиторий с GitHub:
 ```bash
-git clone https://github.com/your-repository/your-project.git
-cd your-project
+git clone git@github.com:ShantiBB/wallets_api.git
+cd wallets_api
 ```
 
 ### Шаг 2: Создание и активация виртуального окружения
@@ -31,13 +31,14 @@ cd your-project
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # Для Linux/macOS
-venv\Scripts\activate  # Для Windows
+source venv\Scripts\activate  # Для Windows
 ```
 
 ### Шаг 3: Установка зависимостей
 Установите все зависимости из requirements.txt:
 ```bash
-pip install -r requirements.txt
+pip install poetry
+poetry install
 ```
 
 ### Шаг 4: Запуск контейнеров Docker
@@ -52,13 +53,13 @@ docker-compose up --build
 ### Шаг 5: Миграция базы данных
 После того как контейнеры запустились, выполните миграцию базы данных:
 ```bash
-docker-compose exec web python manage.py migrate
+docker-compose exec wallet python manage.py migrate
 ```
 ### Шаг 6: Создание суперпользователя
 Создайте суперпользователя для доступа к Django Admin:
 
 ```bash
-docker-compose exec web python manage.py createsuperuser
+docker-compose exec wallet python manage.py createsuperuser
 ```
 
 ## API
