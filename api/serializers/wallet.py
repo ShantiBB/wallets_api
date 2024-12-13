@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from djoser.serializers import UserSerializer
 
+from services.tasks import wallet_create, wallet_update
 from wallet.models import Wallet
 from core.constants import FORMAT
 from api.serializers.validations import (
@@ -43,6 +44,13 @@ class WalletDetailSerializer(WalletListSerializer):
 
 class WalletCreateSerializer(WalletListSerializer):
 
+    def create(self, validated_data):
+        title = validated_data.get('title')
+        description = validated_data.get('description')
+        owner = validated_data.get('owner')
+        wallet_create.delay(owner.id, title, description)
+        return validated_data
+
     class Meta(WalletListSerializer.Meta):
         fields = ('id', 'title', 'description')
 
@@ -54,16 +62,13 @@ class WalletUpdateSerializer(WalletCreateSerializer):
         valid_update_wallet_title_and_description(self.instance, attrs)
         return attrs
 
-    @transaction.atomic
     def update(self, instance, validated_data):
+        owner_id = instance.owner.id
         wallet_id = instance.id
         title = validated_data.get('title')
         description = validated_data.get('description')
 
-        wallet = Wallet.objects.filter(id=wallet_id).update(
-            title=title,
-            description=description
-        )
+        wallet_update.delay(owner_id, wallet_id, title, description)
 
         validated_data['id'] = wallet_id
         return validated_data

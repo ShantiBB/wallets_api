@@ -15,4 +15,6 @@ class IsAuthorOrAdmin(BasePermission):
         return user.is_authenticated or user.is_staff
 
     def has_object_permission(self, request, view, obj):
+        if isinstance(obj, dict):
+            return request.user == obj.get('owner') or request.user.is_staff
         return request.user == obj.owner or request.user.is_staff

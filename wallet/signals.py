@@ -9,7 +9,6 @@ from services.utils import delete_wallet_cache
 def delete_wallet_cache_after_save(sender, instance, **kwargs):
     delete_wallet_cache(instance.id, instance.owner.id)
 
-
 @receiver(post_delete, sender=Wallet)
 def delete_wallet_cache_after_delete(sender, instance, **kwargs):
     delete_wallet_cache(instance.id, instance.owner.id)

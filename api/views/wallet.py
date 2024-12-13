@@ -27,7 +27,7 @@ class WalletViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Wallet.objects.filter(owner=user).select_related('owner')
+        queryset = Wallet.objects.select_related('owner')
 
         if self.action == 'list':
             queryset = queryset.only(*WALLET_LIST_FIELD, *WALLET_OWNER_FIELD)
@@ -39,7 +39,7 @@ class WalletViewSet(viewsets.ModelViewSet):
         elif self.action == 'operation':
             queryset = queryset.only(*WALLET_TRANSACTION_FIELD)
 
-        return queryset
+        return queryset.filter(owner=user)
 
     def get_serializer_class(self):
         if self.action == 'list':

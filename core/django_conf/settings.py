@@ -1,13 +1,15 @@
 from pathlib import Path
 
+from core.config import settings
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
-SECRET_KEY = 'django-insecure-9*b9)zj))b$^c#y9*5s_-q23cjc#jpv@2&_2qkm@j24+^@iegs'
+SECRET_KEY = settings.django_secret_key
 
-DEBUG = True
+DEBUG = settings.django_debug
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = settings.django_allowed_hosts
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,12 +58,41 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.django_conf.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": settings.postgres_name,
+            "USER": settings.postgres_user,
+            "PASSWORD": settings.postgres_password,
+            "HOST": settings.postgres_host,
+            "PORT": settings.postgres_port,
+        }
+    }
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            },
+        },
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -93,9 +124,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'user.CustomUser'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -112,7 +140,7 @@ DJOSER = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379/0',
+        'LOCATION': f'redis://{settings.redis_host}:6379/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -121,28 +149,11 @@ CACHES = {
 
 CACHE_TIMEOUT = 60
 
-CELERY_BROKER_URL = 'pyamqp://guest@rabbitmq//'
+CELERY_BROKER_URL = f'pyamqp://guest@{settings.rabbitmq_host}//'
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://redis:6379/1'
+CELERY_RESULT_BACKEND = f'redis://{settings.redis_host}:6379/1'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
-    },
-}
