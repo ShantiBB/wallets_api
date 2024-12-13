@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from djoser.serializers import UserSerializer
 
 from wallet.models import Wallet
 from core.constants import FORMAT
@@ -7,44 +8,55 @@ from api.serializers.validations import (
     valid_update_wallet_title_and_description
 )
 
-class WalletSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(format=FORMAT, read_only=True)
-    updated_at = serializers.DateTimeField(format=FORMAT, read_only=True)
+
+class WalletListSerializer(serializers.ModelSerializer):
+    owner = UserSerializer()
 
     class Meta:
         model = Wallet
         fields = (
             'id',
             'title',
-            'description',
             'balance',
-            'created_at',
-            'updated_at'
+            'owner',
         )
         extra_kwargs = {
             'balance': {'read_only': True},
         }
 
 
-class WalletCreateSerializer(WalletSerializer):
+class WalletDetailSerializer(WalletListSerializer):
+    created_at = serializers.DateTimeField(format=FORMAT, read_only=True)
+    updated_at = serializers.DateTimeField(format=FORMAT, read_only=True)
 
-    class Meta(WalletSerializer.Meta):
-        fields = ('title', 'description')
+    class Meta(WalletListSerializer.Meta):
+        fields = (
+            'id',
+            'title',
+            'description',
+            'balance',
+            'owner',
+            'created_at',
+            'updated_at'
+        )
 
 
-class WalletUpdateSerializer(WalletSerializer):
+class WalletCreateSerializer(WalletListSerializer):
+
+    class Meta(WalletListSerializer.Meta):
+        fields = ('id', 'title', 'description')
+
+
+class WalletUpdateSerializer(WalletCreateSerializer):
     description = serializers.CharField(required=True)
 
     def validate(self, attrs):
         valid_update_wallet_title_and_description(self.instance, attrs)
         return attrs
 
-    class Meta(WalletSerializer.Meta):
-        fields = ('id', 'title', 'description')
-
     @transaction.atomic
     def update(self, instance, validated_data):
-        wallet_id = instance.get('id')
+        wallet_id = instance.id
         title = validated_data.get('title')
         description = validated_data.get('description')
 
@@ -52,4 +64,6 @@ class WalletUpdateSerializer(WalletSerializer):
             title=title,
             description=description
         )
+
+        validated_data['id'] = wallet_id
         return validated_data

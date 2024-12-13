@@ -3,9 +3,9 @@ from rest_framework.exceptions import ValidationError
 
 # Валидация кошелька
 def valid_update_wallet_title_and_description(instance, attrs):
-    cur_title = instance.get('title')
+    cur_title = instance.title
     title = attrs.get('title')
-    cur_description = instance.get('description')
+    cur_description = instance.description
     description = attrs.get('description')
 
     if cur_title == title and cur_description == description:
@@ -17,7 +17,7 @@ def valid_transaction_amount(instance, value):
     wallet = instance.context['wallet']
     request_data = instance.context.get('request').data
     operation_type = request_data.get('operation_type')
-    balance = wallet.get('balance')
+    balance = wallet.balance
 
     if value < 10:
         message = 'Сумма транзакции не может быть меньше 10.'
